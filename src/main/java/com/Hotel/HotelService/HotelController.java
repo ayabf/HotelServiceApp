@@ -3,20 +3,31 @@
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.http.HttpStatus;
     import org.springframework.http.ResponseEntity;
+    import org.springframework.stereotype.Repository;
     import org.springframework.web.bind.annotation.*;
     import org.springframework.web.server.ResponseStatusException;
 
+    import java.util.Collections;
     import java.util.List;
 
     @RestController
     @CrossOrigin
     public class HotelController {
+
+        private final HotelService hotelService;
+        private final HotelRepository hotelRepository;
+
         @Autowired
-        HotelService hotelService;
+        public HotelController(HotelService hotelService, HotelRepository hotelRepository) {
+            this.hotelService = hotelService;
+            this.hotelRepository = hotelRepository;
+        }
+
         @GetMapping({"/hotels"})
         public List<Hotel> getHotels() {
             return hotelService.getAllHotels();
         }
+
         @PostMapping("/hotels")
         public ApiResponse createHotel(@RequestBody Hotel hotel) {
             Hotel createdHotel = hotelService.createHotel(hotel);
@@ -62,6 +73,37 @@
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Hôtel non trouvé avec l'ID : " + id));
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("Erreur lors de la récupération de l'hôtel. Erreur : " + e.getMessage()));
+            }
+        }
+        @GetMapping("/search")
+        public ResponseEntity<?> searchHotels(@RequestParam(required = false) String name, @RequestParam(required = false) String address) {
+            try {
+                List<Hotel> hotels;
+
+                if (name == null && address == null) {
+                    // Retourner tous les hôtels si aucun critère de recherche n'est spécifié
+                    hotels = hotelRepository.findAll();
+                } else {
+                    // Filtrer les hôtels en fonction du nom et de l'adresse
+                    if (name != null && address != null) {
+                        hotels = hotelRepository.findByNameAndAddress(name, address);
+                    } else if (name != null) {
+                        hotels = hotelRepository.findByName(name);
+                    } else if (address != null) {
+                        hotels = hotelRepository.findByAddress(address);
+                    } else {
+                        // Gérer d'autres cas si nécessaire
+                        hotels = Collections.emptyList();
+                    }
+                }
+
+                if (hotels.isEmpty()) {
+                    return ResponseEntity.ok("Aucun hôtel trouvé.");
+                } else {
+                    return ResponseEntity.ok(hotels);
+                }
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la recherche des hôtels. Erreur : " + e.getMessage());
             }
         }
 
