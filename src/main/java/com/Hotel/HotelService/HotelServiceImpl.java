@@ -88,4 +88,14 @@ public class HotelServiceImpl implements HotelService {
             log.error("Échec de la suppression de l'hôtel. Hôtel avec l'ID {} non trouvé.", id);
         }
     }
-} // test
+    @Override
+    public List<Hotel> searchHotels(String name, String address) {
+        if (name == null && address == null) {
+            // Retourner tous les hôtels si aucun critère de recherche n'est spécifié
+            return hotelRepository.findAll();
+        } else {
+            // Filtrer les hôtels en fonction du nom et de l'adresse
+            return hotelRepository.findByNameAndAddress(name, address);
+        }
+    }
+}

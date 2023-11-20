@@ -8,4 +8,5 @@ public interface HotelService {
     Hotel createHotel(Hotel hotel);
     Hotel updateHotel(Long id, Hotel hotel);
     void deleteHotel(Long id);
+    List<Hotel> searchHotels(String name, String address);
 }
