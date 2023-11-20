@@ -35,5 +35,5 @@ public class HotelServiceApplication implements CommandLineRunner {
 		hotel2.setRating(3);
 		hotelRepository.save(hotel2);
 
-	}
+	} // test
 }
