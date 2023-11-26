@@ -45,6 +45,7 @@
             }
         }
 
+
         @PutMapping("/hotels/{id}")
         public ApiResponse updateHotel(@PathVariable Long id, @RequestBody Hotel hotel) {
             try {
