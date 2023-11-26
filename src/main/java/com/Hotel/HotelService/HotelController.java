@@ -11,7 +11,7 @@
     import java.util.List;
 
     @RestController
-    @CrossOrigin
+    @CrossOrigin(origins = "http://localhost:4200") // Remplacez par l'URL de votre application Angular
     public class HotelController {
 
         private final HotelService hotelService;
@@ -29,8 +29,14 @@
         }
 
         @PostMapping("/hotels")
-        public ApiResponse createHotel(@RequestBody Hotel hotel) {
-            Hotel createdHotel = hotelService.createHotel(hotel);
+        public ApiResponse createHotel(@RequestBody Hotel hotelRequest) {
+            // Perform validation and processing for other fields
+
+            // Add image URL to the hotel entity
+            String imageUrl = hotelRequest.getImageUrl();
+            hotelRequest.setImageUrl(imageUrl);
+
+            Hotel createdHotel = hotelService.createHotel(hotelRequest);
 
             if (createdHotel != null) {
                 return new ApiResponse("Hôtel créé avec succès !");
@@ -38,6 +44,7 @@
                 return new ApiResponse("Échec de la création de l'hôtel.");
             }
         }
+
 
         @PutMapping("/hotels/{id}")
         public ApiResponse updateHotel(@PathVariable Long id, @RequestBody Hotel hotel) {
@@ -75,6 +82,7 @@
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse("Erreur lors de la récupération de l'hôtel. Erreur : " + e.getMessage()));
             }
         }
+
         @GetMapping("/search")
         public ResponseEntity<?> searchHotels(@RequestParam(required = false) String name, @RequestParam(required = false) String address) {
             try {
@@ -106,5 +114,4 @@
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la recherche des hôtels. Erreur : " + e.getMessage());
             }
         }
-
     }

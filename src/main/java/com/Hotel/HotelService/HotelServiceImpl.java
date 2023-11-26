@@ -10,10 +10,12 @@ import java.util.Optional;
 
 @Service
 public class HotelServiceImpl implements HotelService {
-     private static final Logger log = LoggerFactory.getLogger(HotelServiceImpl.class);
+
+    private static final Logger log = LoggerFactory.getLogger(HotelServiceImpl.class);
 
     @Autowired
     HotelRepository hotelRepository;
+
     @Override
     public List<Hotel> getAllHotels() {
         return hotelRepository.findAll();
@@ -32,45 +34,45 @@ public class HotelServiceImpl implements HotelService {
         }
     }
 
-     public Hotel createHotel(Hotel hotel) {
-         Hotel createdHotel = hotelRepository.save(hotel);
+    @Override
+    public Hotel createHotel(Hotel hotel) {
+        Hotel createdHotel = hotelRepository.save(hotel);
 
-         if (createdHotel != null) {
-             log.info("Hôtel créé avec succès !");
-         } else {
-             log.error("Échec de la création de l'hôtel.");
-         }
+        if (createdHotel != null) {
+            log.info("Hôtel créé avec succès !");
+        } else {
+            log.error("Échec de la création de l'hôtel.");
+        }
 
-         return createdHotel;
-     }
+        return createdHotel;
+    }
 
-     @Override
-     public Hotel updateHotel(Long id, Hotel hotel) {
-         Optional<Hotel> optionalExistingHotel = hotelRepository.findById(id);
+    @Override
+    public Hotel updateHotel(Long id, Hotel hotel) {
+        Optional<Hotel> optionalExistingHotel = hotelRepository.findById(id);
 
-         if (optionalExistingHotel.isPresent()) {
-             Hotel existingHotel = optionalExistingHotel.get();
+        if (optionalExistingHotel.isPresent()) {
+            Hotel existingHotel = optionalExistingHotel.get();
 
-             // Copier les propriétés non nulles de hotel vers existingHotel
-             BeanUtils.copyProperties(hotel, existingHotel, "id");
+            // Copier les propriétés non nulles de hotel vers existingHotel
+            BeanUtils.copyProperties(hotel, existingHotel, "id");
 
-             // Mettre à jour l'hôtel dans la base de données
-             Hotel updatedHotel = hotelRepository.save(existingHotel);
+            // Mettre à jour l'hôtel dans la base de données
+            Hotel updatedHotel = hotelRepository.save(existingHotel);
 
-             if (updatedHotel != null) {
-                 log.info("Hôtel avec l'ID {} mis à jour avec succès !", id);
-             } else {
-                 log.error("Échec de la mise à jour de l'hôtel avec l'ID {}.", id);
-             }
+            if (updatedHotel != null) {
+                log.info("Hôtel avec l'ID {} mis à jour avec succès !", id);
+            } else {
+                log.error("Échec de la mise à jour de l'hôtel avec l'ID {}.", id);
+            }
 
-             return updatedHotel;
-         } else {
-             // Gérer le cas où l'hôtel n'est pas trouvé
-             log.error("Échec de la mise à jour de l'hôtel. Hôtel avec l'ID {} non trouvé.", id);
-             return null;
-         }
-     }
-
+            return updatedHotel;
+        } else {
+            // Gérer le cas où l'hôtel n'est pas trouvé
+            log.error("Échec de la mise à jour de l'hôtel. Hôtel avec l'ID {} non trouvé.", id);
+            return null;
+        }
+    }
 
     @Override
     public void deleteHotel(Long id) {
@@ -88,6 +90,7 @@ public class HotelServiceImpl implements HotelService {
             log.error("Échec de la suppression de l'hôtel. Hôtel avec l'ID {} non trouvé.", id);
         }
     }
+
     @Override
     public List<Hotel> searchHotels(String name, String address) {
         if (name == null && address == null) {
