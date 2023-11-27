@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,13 +94,11 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public List<Hotel> searchHotels(String name, String address) {
-        if (name == null && address == null) {
-            // Retourner tous les hôtels si aucun critère de recherche n'est spécifié
-            return hotelRepository.findAll();
-        } else {
-            // Filtrer les hôtels en fonction du nom et de l'adresse
-            return hotelRepository.findByNameAndAddress(name, address);
-        }
+    public List<Hotel> searchHotels(String name, String address, String country, String location, LocalDate checkIn, LocalDate checkOut, Integer duration, Integer members) {
+        // Implement the search logic based on the new criteria
+        // Use the hotelRepository to query the database
+
+        // Example:
+        return hotelRepository.findByCountryAndLocationAndCheckInAndCheckOutAndDurationAndMembers(country, location, checkIn, checkOut, duration, members);
     }
 }

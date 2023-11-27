@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor
@@ -20,12 +21,15 @@ public class Hotel {
     private String name;
     private String address;
     private int rating;
-
-    // New field for storing image information
+    private String country;
+    private String location;
+    private LocalDate checkIn;
+    private LocalDate checkOut;
+    private int duration;
+    private int members;
     @Column
     private String imageUrl;
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -66,6 +70,54 @@ public class Hotel {
         this.imageUrl = imageUrl;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public LocalDate getCheckIn() {
+        return checkIn;
+    }
+
+    public void setCheckIn(LocalDate checkIn) {
+        this.checkIn = checkIn;
+    }
+
+    public LocalDate getCheckOut() {
+        return checkOut;
+    }
+
+    public void setCheckOut(LocalDate checkOut) {
+        this.checkOut = checkOut;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public int getMembers() {
+        return members;
+    }
+
+    public void setMembers(int members) {
+        this.members = members;
+    }
+
     // toString method
     @Override
     public String toString() {
@@ -75,6 +127,12 @@ public class Hotel {
                 ", address='" + address + '\'' +
                 ", rating=" + rating +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", country='" + country + '\'' +
+                ", location='" + location + '\'' +
+                ", checkIn=" + checkIn +
+                ", checkOut=" + checkOut +
+                ", duration=" + duration +
+                ", members=" + members +
                 '}';
     }
 }
