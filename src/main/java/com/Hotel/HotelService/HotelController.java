@@ -7,6 +7,7 @@
     import org.springframework.web.bind.annotation.*;
     import org.springframework.web.server.ResponseStatusException;
 
+    import java.time.LocalDate;
     import java.util.Collections;
     import java.util.List;
 
@@ -84,34 +85,26 @@
         }
 
         @GetMapping("/search")
-        public ResponseEntity<?> searchHotels(@RequestParam(required = false) String name, @RequestParam(required = false) String address) {
+        public ResponseEntity<?> searchHotels(
+                @RequestParam(required = false) String name,
+                @RequestParam(required = false) String address,
+                @RequestParam(required = false) String country,
+                @RequestParam(required = false) String location,
+                @RequestParam(required = false) LocalDate checkIn,
+                @RequestParam(required = false) LocalDate checkOut,
+                @RequestParam(required = false) Integer duration,
+                @RequestParam(required = false) Integer members
+        ) {
             try {
-                List<Hotel> hotels;
-
-                if (name == null && address == null) {
-                    // Retourner tous les hôtels si aucun critère de recherche n'est spécifié
-                    hotels = hotelRepository.findAll();
-                } else {
-                    // Filtrer les hôtels en fonction du nom et de l'adresse
-                    if (name != null && address != null) {
-                        hotels = hotelRepository.findByNameAndAddress(name, address);
-                    } else if (name != null) {
-                        hotels = hotelRepository.findByName(name);
-                    } else if (address != null) {
-                        hotels = hotelRepository.findByAddress(address);
-                    } else {
-                        // Gérer d'autres cas si nécessaire
-                        hotels = Collections.emptyList();
-                    }
-                }
+                List<Hotel> hotels = hotelService.searchHotels(name, address, country, location, checkIn, checkOut, duration, members);
 
                 if (hotels.isEmpty()) {
-                    return ResponseEntity.ok("Aucun hôtel trouvé.");
+                    return ResponseEntity.ok("No hotels found.");
                 } else {
                     return ResponseEntity.ok(hotels);
                 }
             } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la recherche des hôtels. Erreur : " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error searching hotels. Error: " + e.getMessage());
             }
         }
     }
