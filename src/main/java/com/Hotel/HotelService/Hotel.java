@@ -25,8 +25,8 @@ public class Hotel {
     private String location;
     private LocalDate checkIn;
     private LocalDate checkOut;
-    private int duration;
-    private int members;
+    private Integer duration;
+    private Integer members;
     @Column
     private String imageUrl;
 
@@ -102,19 +102,19 @@ public class Hotel {
         this.checkOut = checkOut;
     }
 
-    public int getDuration() {
+    public Integer getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(Integer duration) {
         this.duration = duration;
     }
 
-    public int getMembers() {
+    public Integer getMembers() {
         return members;
     }
 
-    public void setMembers(int members) {
+    public void setMembers(Integer members) {
         this.members = members;
     }
 

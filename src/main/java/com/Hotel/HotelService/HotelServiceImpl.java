@@ -93,12 +93,58 @@ public class HotelServiceImpl implements HotelService {
         }
     }
 
-    @Override
-    public List<Hotel> searchHotels(String name, String address, String country, String location, LocalDate checkIn, LocalDate checkOut, Integer duration, Integer members) {
-        // Implement the search logic based on the new criteria
-        // Use the hotelRepository to query the database
 
-        // Example:
-        return hotelRepository.findByCountryAndLocationAndCheckInAndCheckOutAndDurationAndMembers(country, location, checkIn, checkOut, duration, members);
+    @Override
+    public List<Hotel> searchHotel(String name, String address) {
+        if (name == null && address == null) {
+            return hotelRepository.findAll();
+        } else {
+            return hotelRepository.findByNameAndAddress(name, address);
+        }
     }
+    private List<Hotel> filterByAvailability(List<Hotel> hotels, LocalDate checkIn, LocalDate checkOut) {
+
+        return hotelRepository.findByAvailability(checkIn, checkOut);
+    }
+
+
+
+
+    public List<Hotel> advancedSearchHotels(String country, String location, LocalDate checkIn, LocalDate checkOut, Integer duration, Integer members) {
+        List<Hotel> searchResults = hotelRepository.findByCountryAndLocation(country, location);
+
+        if (checkIn != null && checkOut != null) {
+            searchResults = filterByAvailability(searchResults, checkIn, checkOut);
+        }
+
+        // Filter by duration of stay
+        if (duration != null) {
+            searchResults = filterByDuration(searchResults, duration);
+        }
+
+        // Filter by number of members
+        if (members != null) {
+            searchResults = filterByMembers(searchResults, members);
+        }
+
+        return searchResults;
+    }
+    private List<Hotel> filterByDuration(List<Hotel> hotels, int duration) {
+        return hotelRepository.findByDuration(duration);
+    }
+    private List<Hotel> filterByMembers(List<Hotel> hotels, int members) {
+        return hotelRepository.findByMembers(members);
+    }
+
+    @Override
+    public List<Hotel> searchHotels(String name, String address) {
+        if (name == null && address == null) {
+            // Retourner tous les hôtels si aucun critère de recherche n'est spécifié
+            return hotelRepository.findAll();
+        } else {
+            // Filtrer les hôtels en fonction du nom et de l'adresse
+            return hotelRepository.findByNameAndAddress(name, address);
+        }
+    }
+
 }
