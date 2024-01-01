@@ -32,7 +32,7 @@ public class HotelServiceApplication implements CommandLineRunner {
 		hotel1.setLocation("Location A");
 		hotel1.setCheckIn(LocalDate.now());
 		hotel1.setCheckOut(LocalDate.now().plusDays(3));
-		hotel1.setDuration(3);
+		hotel1.setDuration("4");
 		hotel1.setMembers(2);
 
 		Hotel hotel2 = new Hotel();
@@ -44,7 +44,7 @@ public class HotelServiceApplication implements CommandLineRunner {
 		hotel2.setLocation("Location B");
 		hotel2.setCheckIn(LocalDate.now().plusDays(1));
 		hotel2.setCheckOut(LocalDate.now().plusDays(4));
-		hotel2.setDuration(3);
+		hotel2.setDuration("3");
 		hotel2.setMembers(3);
 
 		hotelRepository.save(hotel1);

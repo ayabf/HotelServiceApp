@@ -12,22 +12,24 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
     List<Hotel> findByName(String name);
     List<Hotel> findByAddress(String address);
 
-    default List<Hotel> findByCountryAndLocationAndCheckInAndCheckOutAndDurationAndMembers(String country, String location, LocalDate checkIn, LocalDate checkOut, Integer duration, Integer members) {
-        return null;
-    }
-
     List<Hotel> findAll();
     @Query("SELECT h FROM Hotel h WHERE h.checkIn >= :checkIn AND h.checkOut <= :checkOut")
     List<Hotel> findByAvailability(
             @Param("checkIn") LocalDate checkIn,
             @Param("checkOut") LocalDate checkOut
     );
-    List<Hotel> findByDuration(Integer duration);
+    List<Hotel> findByDuration(String duration);
     List<Hotel> findByMembers(Integer members);
     @Query("SELECT h FROM Hotel h WHERE h.country = :country AND h.location = :location")
     List<Hotel> findByCountryAndLocation(
             @Param("country") String country,
             @Param("location") String location
     );
+    @Query("SELECT DISTINCT country FROM Hotel")
+    List<String> findDistinctCountries();
+
+    @Query("SELECT DISTINCT location FROM Hotel")
+    List<String> findDistinctLocations();
+    List<Hotel> findByNameAndAddressAndCountryAndLocation(String name, String address, String country, String location);
 
 }

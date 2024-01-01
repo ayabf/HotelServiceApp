@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,8 +112,8 @@ public class HotelServiceImpl implements HotelService {
 
 
 
-    public List<Hotel> advancedSearchHotels(String country, String location, LocalDate checkIn, LocalDate checkOut, Integer duration, Integer members) {
-        List<Hotel> searchResults = hotelRepository.findByCountryAndLocation(country, location);
+    public List<Hotel> advancedSearchHotels(String name, String address, String country, String location, LocalDate checkIn, LocalDate checkOut, String duration, Integer members) {
+        List<Hotel> searchResults = hotelRepository.findByNameAndAddressAndCountryAndLocation(name, address, country, location);
 
         if (checkIn != null && checkOut != null) {
             searchResults = filterByAvailability(searchResults, checkIn, checkOut);
@@ -119,7 +121,7 @@ public class HotelServiceImpl implements HotelService {
 
         // Filter by duration of stay
         if (duration != null) {
-            searchResults = filterByDuration(searchResults, duration);
+            searchResults = filterByDuration(searchResults, duration); // Check for null before invoking intValue()
         }
 
         // Filter by number of members
@@ -129,9 +131,12 @@ public class HotelServiceImpl implements HotelService {
 
         return searchResults;
     }
-    private List<Hotel> filterByDuration(List<Hotel> hotels, int duration) {
-        return hotelRepository.findByDuration(duration);
+
+
+    public List<Hotel> filterByDuration(List<Hotel> hotels, String duration) {
+       return hotelRepository.findByDuration(duration);
     }
+
     private List<Hotel> filterByMembers(List<Hotel> hotels, int members) {
         return hotelRepository.findByMembers(members);
     }
@@ -146,5 +151,29 @@ public class HotelServiceImpl implements HotelService {
             return hotelRepository.findByNameAndAddress(name, address);
         }
     }
+    @Override
+    public List<String> getCountries() {
+        // Fetch countries from the database using your HotelRepository
+        List<String> countries = hotelRepository.findDistinctCountries();
+        return countries;
+    }
+
+    @Override
+    public List<String> getLocations() {
+        // Fetch locations from the database using your HotelRepository
+        List<String> locations = hotelRepository.findDistinctLocations();
+        return locations;
+    }
+
+    @Override
+    public List<Hotel> findByNameAndAddressAndCountryAndLocation(String name, String address, String country, String location) {
+        return hotelRepository.findByNameAndAddressAndCountryAndLocation(name, address, country, location);
+    }
+
+
+
+
+
+
 
 }

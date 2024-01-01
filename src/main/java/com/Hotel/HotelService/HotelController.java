@@ -114,18 +114,18 @@
                 @RequestParam(required = false) String location,
                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
                 @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut,
-                @RequestParam(required = false) int duration,
-                @RequestParam(required = false) int members) {
+                @RequestParam(required = false) String duration,
+                @RequestParam(required = false) Integer members) {
             try {
                 List<Hotel> hotels;
 
-                if ((name == null && address == null) || (country == null && location == null && checkIn == null && checkOut == null && duration == 0 && members == 0)) {
+                if ((name == null && address == null) || (country == null && location == null && checkIn == null && checkOut == null && duration == null && members == null)) {
                     hotels = hotelService.getAllHotels();
                 } else {
                     if (name != null || address != null) {
                         hotels = hotelService.searchHotel(name, address);
                     } else {
-                        hotels = hotelService.advancedSearchHotels(country, location, checkIn, checkOut, duration, members);
+                        hotels = hotelService.advancedSearchHotels(name , address,country, location, checkIn, checkOut, duration, members);
                     }
                 }
 
@@ -172,5 +172,16 @@
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la recherche des hôtels. Erreur : " + e.getMessage());
             }
+        }
+        @GetMapping("/hotels/countries")
+        public ResponseEntity<List<String>> getCountries() {
+            List<String> countries = hotelService.getCountries();
+            return new ResponseEntity<>(countries, HttpStatus.OK);
+        }
+
+        @GetMapping("/hotels/locations")
+        public ResponseEntity<List<String>> getLocations() {
+            List<String> locations = hotelService.getLocations();
+            return new ResponseEntity<>(locations, HttpStatus.OK);
         }
     }
