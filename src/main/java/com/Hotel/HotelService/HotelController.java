@@ -4,16 +4,18 @@
     import org.springframework.format.annotation.DateTimeFormat;
     import org.springframework.http.HttpStatus;
     import org.springframework.http.ResponseEntity;
+    import org.springframework.security.access.prepost.PreAuthorize;
     import org.springframework.stereotype.Repository;
     import org.springframework.web.bind.annotation.*;
     import org.springframework.web.server.ResponseStatusException;
 
+    import javax.annotation.security.RolesAllowed;
     import java.time.LocalDate;
     import java.util.Collections;
     import java.util.List;
 
     @RestController
-    @CrossOrigin(origins = "http://localhost:4200") // Remplacez par l'URL de votre application Angular
+    @CrossOrigin(origins = "http://localhost:4200")
     public class HotelController {
 
         private final HotelService hotelService;
@@ -26,15 +28,15 @@
         }
 
         @GetMapping({"/hotels"})
+        @RolesAllowed("admin")
         public List<Hotel> getHotels() {
             return hotelService.getAllHotels();
         }
 
         @PostMapping("/hotels")
+        @RolesAllowed("admin")
         public ApiResponse createHotel(@RequestBody Hotel hotelRequest) {
-            // Perform validation and processing for other fields
 
-            // Add image URL to the hotel entity
             String imageUrl = hotelRequest.getImageUrl();
             hotelRequest.setImageUrl(imageUrl);
 
