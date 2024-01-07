@@ -2,13 +2,22 @@ package com.Hotel.HotelService;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class HotelServiceImpl implements HotelService {
@@ -19,19 +28,17 @@ public class HotelServiceImpl implements HotelService {
     HotelRepository hotelRepository;
 
     @Override
-    public List<Hotel> getAllHotels() {
-        return hotelRepository.findAll();
+    public Page<Hotel> getAllHotels(Pageable pageable) {
+        return hotelRepository.findAll(pageable);
     }
 
     @Override
-    public Hotel getHotelById(Long id) {
+    public Hotel getHotelById(String id) {
         Optional<Hotel> optionalHotel = hotelRepository.findById(id);
 
-        // Vérifier si l'hôtel avec l'ID spécifié existe
         if (optionalHotel.isPresent()) {
             return optionalHotel.get();
         } else {
-            // Gérer le cas où l'hôtel n'est pas trouvé
             throw new HotelNotFoundException("Hôtel non trouvé avec l'ID : " + id);
         }
     }
@@ -50,101 +57,67 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
-    public Hotel updateHotel(Long id, Hotel hotel) {
-        Optional<Hotel> optionalExistingHotel = hotelRepository.findById(id);
+    public void updateHotel( String id,Hotel hotel) {
+        Hotel existiongHotel = hotelRepository.findById(id).get();
+        existiongHotel.setNbRooms(hotel.getNbRooms());
+        existiongHotel.setPrice(hotel.getPrice());
+        existiongHotel.setNbSuites(hotel.getNbSuites());
+        existiongHotel.setStarNumber(hotel.getStarNumber());
+        existiongHotel.setAddress(hotel.getAddress());
+        existiongHotel.setCountry(hotel.getCountry());
+        existiongHotel.setName(hotel.getName());
+        existiongHotel.setLocation(hotel.getLocation());
+        if (hotel.getImageUrl() != null && !hotel.getImageUrl().isEmpty()) {
+            existiongHotel.setImageUrl(hotel.getImageUrl());
 
-        if (optionalExistingHotel.isPresent()) {
-            Hotel existingHotel = optionalExistingHotel.get();
-
-            // Copier les propriétés non nulles de hotel vers existingHotel
-            BeanUtils.copyProperties(hotel, existingHotel, "id");
-
-            // Mettre à jour l'hôtel dans la base de données
-            Hotel updatedHotel = hotelRepository.save(existingHotel);
-
-            if (updatedHotel != null) {
-                log.info("Hôtel avec l'ID {} mis à jour avec succès !", id);
-            } else {
-                log.error("Échec de la mise à jour de l'hôtel avec l'ID {}.", id);
-            }
-
-            return updatedHotel;
-        } else {
-            // Gérer le cas où l'hôtel n'est pas trouvé
-            log.error("Échec de la mise à jour de l'hôtel. Hôtel avec l'ID {} non trouvé.", id);
-            return null;
         }
+
+        hotelRepository.save(existiongHotel);
+
     }
 
     @Override
-    public void deleteHotel(Long id) {
+    public void deleteHotel(String id) {
         Optional<Hotel> optionalExistingHotel = hotelRepository.findById(id);
 
         if (optionalExistingHotel.isPresent()) {
             Hotel existingHotel = optionalExistingHotel.get();
 
-            // Supprimer l'hôtel de la base de données
             hotelRepository.delete(existingHotel);
-
             log.info("Hôtel avec l'ID {} supprimé avec succès !", id);
         } else {
-            // Gérer le cas où l'hôtel n'est pas trouvé
             log.error("Échec de la suppression de l'hôtel. Hôtel avec l'ID {} non trouvé.", id);
         }
     }
 
 
     @Override
-    public List<Hotel> searchHotel(String name, String address) {
-        if (name == null && address == null) {
-            return hotelRepository.findAll();
-        } else {
-            return hotelRepository.findByNameAndAddress(name, address);
-        }
-    }
-    private List<Hotel> filterByAvailability(List<Hotel> hotels, LocalDate checkIn, LocalDate checkOut) {
-
-        return hotelRepository.findByAvailability(checkIn, checkOut);
-    }
-
-
-
-
-    public List<Hotel> advancedSearchHotels(String country, String location, LocalDate checkIn, LocalDate checkOut, Integer duration, Integer members) {
-        List<Hotel> searchResults = hotelRepository.findByCountryAndLocation(country, location);
-
-        if (checkIn != null && checkOut != null) {
-            searchResults = filterByAvailability(searchResults, checkIn, checkOut);
-        }
-
-        // Filter by duration of stay
-        if (duration != null) {
-            searchResults = filterByDuration(searchResults, duration);
-        }
-
-        // Filter by number of members
-        if (members != null) {
-            searchResults = filterByMembers(searchResults, members);
-        }
-
-        return searchResults;
-    }
-    private List<Hotel> filterByDuration(List<Hotel> hotels, int duration) {
-        return hotelRepository.findByDuration(duration);
-    }
-    private List<Hotel> filterByMembers(List<Hotel> hotels, int members) {
-        return hotelRepository.findByMembers(members);
+    public List<String> getCountries() {
+        List<String> countries = hotelRepository.findDistinctCountries();
+        return countries;
     }
 
     @Override
-    public List<Hotel> searchHotels(String name, String address) {
-        if (name == null && address == null) {
-            // Retourner tous les hôtels si aucun critère de recherche n'est spécifié
-            return hotelRepository.findAll();
-        } else {
-            // Filtrer les hôtels en fonction du nom et de l'adresse
-            return hotelRepository.findByNameAndAddress(name, address);
-        }
+    public List<String> getLocations() {
+        List<String> locations = hotelRepository.findDistinctLocations();
+        return locations;
     }
 
+
+
+@Override
+    public String saveImage(MultipartFile image) {
+    String serverAddress = "http://localhost:8081";
+    String directory = "uploads/";
+        String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+        String filePath = directory + fileName;
+    try {
+        Files.copy(image.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+
+    return serverAddress + "/" + filePath;
+    }
 }

@@ -1,16 +1,24 @@
 package com.Hotel.HotelService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDate;
 import java.util.List;
 
 public interface HotelService {
-    List<Hotel> getAllHotels();
-    Hotel getHotelById(Long id);
+    Page<Hotel> getAllHotels(Pageable pageable);
+    Hotel getHotelById(String id);
     Hotel createHotel(Hotel hotel);
-    Hotel updateHotel(Long id, Hotel hotel);
-    void deleteHotel(Long id);
-    List<Hotel> searchHotel(String name, String address);
-    List<Hotel> advancedSearchHotels(String country, String location, LocalDate checkIn, LocalDate checkOut, Integer duration, Integer members);
-    List<Hotel> searchHotels(String name, String address);
+    void updateHotel(String id, Hotel hotel);
+    void deleteHotel(String id);
+
+    List<String> getCountries();
+
+    List<String> getLocations();
+    String saveImage(MultipartFile image);
+
+
 
 }
