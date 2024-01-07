@@ -1,33 +1,21 @@
 package com.Hotel.HotelService;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
+import org.springframework.data.mongodb.repository.Aggregation;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+
 import java.util.List;
 
-public interface HotelRepository extends JpaRepository<Hotel, Long> {
-    List<Hotel> findByNameAndAddress(String name, String address);
-    List<Hotel> findByName(String name);
-    List<Hotel> findByAddress(String address);
+public interface HotelRepository extends MongoRepository<Hotel, String> {
+    Page<Hotel> findAll( Pageable pageable);
+    @Aggregation(pipeline = { "{ '$group': { '_id' : '$country' } }" })
+    List<String> findDistinctCountries();
 
-    default List<Hotel> findByCountryAndLocationAndCheckInAndCheckOutAndDurationAndMembers(String country, String location, LocalDate checkIn, LocalDate checkOut, Integer duration, Integer members) {
-        return null;
-    }
+    @Aggregation(pipeline = { "{ '$group': { '_id' : '$location' } }" })
+    List<String> findDistinctLocations();
 
-    List<Hotel> findAll();
-    @Query("SELECT h FROM Hotel h WHERE h.checkIn >= :checkIn AND h.checkOut <= :checkOut")
-    List<Hotel> findByAvailability(
-            @Param("checkIn") LocalDate checkIn,
-            @Param("checkOut") LocalDate checkOut
-    );
-    List<Hotel> findByDuration(Integer duration);
-    List<Hotel> findByMembers(Integer members);
-    @Query("SELECT h FROM Hotel h WHERE h.country = :country AND h.location = :location")
-    List<Hotel> findByCountryAndLocation(
-            @Param("country") String country,
-            @Param("location") String location
-    );
 
 }
