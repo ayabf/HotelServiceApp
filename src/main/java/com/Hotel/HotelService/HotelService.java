@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 public interface HotelService {
@@ -18,7 +19,9 @@ public interface HotelService {
 
     List<String> getLocations();
     String saveImage(MultipartFile image);
-
+    Page<Hotel> searchHotels(String country, String location,Double minPrice,Double maxPrice,
+                             Integer starNumber,Pageable pageable
+                             );
 
 
 }

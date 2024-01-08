@@ -16,6 +16,4 @@ public interface HotelRepository extends MongoRepository<Hotel, String> {
 
     @Aggregation(pipeline = { "{ '$group': { '_id' : '$location' } }" })
     List<String> findDistinctLocations();
-
-
 }
