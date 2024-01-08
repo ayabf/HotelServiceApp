@@ -18,6 +18,7 @@
     import javax.annotation.security.RolesAllowed;
     import java.time.LocalDate;
     import java.util.Collections;
+    import java.util.Date;
     import java.util.List;
 
     @RestController
@@ -34,7 +35,6 @@
         }
 
         @GetMapping({"/hotels"})
-        @RolesAllowed("admin")
         public Page<Hotel> getHotels(@RequestParam(defaultValue = "1") int page,
                                      @RequestParam(defaultValue = "10") int size) {
             return hotelService.getAllHotels(PageRequest.of(page, size));
@@ -60,6 +60,7 @@
 
 
         @PutMapping("/hotels/{id}")
+        @RolesAllowed("admin")
         public ApiResponse updateHotel(@PathVariable String id,@RequestPart("image") MultipartFile image, @RequestPart("hotel") String hotel) {
             try {
                 Hotel hotelRequest = new ObjectMapper().readValue(hotel, Hotel.class);
@@ -77,6 +78,7 @@
         }
 
         @DeleteMapping("/hotels/{id}")
+        @RolesAllowed("admin")
         public ApiResponse deleteHotel(@PathVariable String id) {
             try {
                 hotelService.deleteHotel(id);
@@ -109,4 +111,22 @@
             List<String> locations = hotelService.getLocations();
             return new ResponseEntity<>(locations, HttpStatus.OK);
         }
+        @GetMapping("hotelsSearch")
+        public ResponseEntity<Page<Hotel>> searchHotels(
+                @RequestParam(required = false, defaultValue = "") String country,
+                @RequestParam(required = false, defaultValue = "") String location,
+                @RequestParam(required = false, defaultValue = "0") Double minPrice,
+                @RequestParam(required = false, defaultValue = "0") Double maxPrice,
+                @RequestParam(required = false, defaultValue = "0") int starNumber,
+                @RequestParam(defaultValue = "0") int page,
+                @RequestParam(defaultValue = "10") int size
+        ) {
+            Page<Hotel> hotels = hotelService.searchHotels(
+                    country, location, minPrice, maxPrice,
+                    starNumber,PageRequest.of(page, size)
+            );
+
+            return new ResponseEntity<>(hotels, HttpStatus.OK);
+        }
+
     }

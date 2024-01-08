@@ -1,20 +1,21 @@
 package com.Hotel.HotelService;
 
-import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,7 +27,11 @@ public class HotelServiceImpl implements HotelService {
 
     @Autowired
     HotelRepository hotelRepository;
+    private final MongoTemplate mongoTemplate;
 
+    public HotelServiceImpl(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
     @Override
     public Page<Hotel> getAllHotels(Pageable pageable) {
         return hotelRepository.findAll(pageable);
@@ -119,5 +124,42 @@ public class HotelServiceImpl implements HotelService {
 
 
     return serverAddress + "/" + filePath;
+    }
+    public Page<Hotel> searchHotels(
+            String country,
+            String location,
+            Double minPrice,
+            Double maxPrice,
+            Integer starNumber,
+            Pageable pageable
+    ) {
+        Query query = new Query();
+
+        if (country != "" && !country.isEmpty()) {
+            query.addCriteria(Criteria.where("country").is(country));
+        }
+
+        if (location != "" && !location.isEmpty()) {
+            query.addCriteria(Criteria.where("location").is(location));
+        }
+        if (minPrice != null  && minPrice != 0 && maxPrice != null  && maxPrice != 0) {
+            query.addCriteria(Criteria.where("price").gte(minPrice).lte(maxPrice));
+
+        }else if (minPrice == null  && minPrice == 0) {
+            query.addCriteria(Criteria.where("price").lte(maxPrice));
+
+        }else {
+            query.addCriteria(Criteria.where("price").gte(minPrice));
+
+        }
+
+        if (starNumber != null  && starNumber != 0) {
+            query.addCriteria(Criteria.where("starNumber").is(starNumber));
+        }
+
+        long count = mongoTemplate.count(query, Hotel.class);
+        List<Hotel> hotels = mongoTemplate.find(query.with(pageable), Hotel.class);
+
+        return new PageImpl<>(hotels, pageable, count);
     }
 }
